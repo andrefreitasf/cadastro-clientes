@@ -1,10 +1,9 @@
+const db = require("./db");
 const readline = require('node:readline/promises');
 const { stdin: input, stdout: output, exit } = require('node:process');
 
 const rl = readline.createInterface({ input, output });
 
-
-const customers = [];
 
 function validateName(name){
     // Verifica se 'name' é falsy (null, undefined, "", etc.)
@@ -34,17 +33,12 @@ async function getAnswer(question, errorMessage, validationFunction){
 async function startRegistration(){
     console.clear();
 
-
     const name = await getAnswer("Qual o nome do cliente? ", "Nome inválido, tente novamente.", validateName);
     const address = await getAnswer("Qual o endereço do cliente? ", "Endereço inválido, tente novamente.", validateAddress);
     const cpf = await getAnswer("Qual o CPF do cliente? ", "CPF inválido, tente novamente.", () => { return true})
 
-    const id = customers.length > 0 // if
-        ? customers[customers.length - 1].id + 1 // then
-        : 1; // else
+    db.addCustomer(name, address, cpf);
     
-        
-    customers.push({ name, address, id, cpf });
     console.log("Cliente cadastrado com sucesso!")
     await rl.question("Carregue no Enter para avançar...");
     printMenu();
@@ -54,10 +48,11 @@ async function listCustomers(){
     console.clear();
     console.log("Clientes cadastrados: ");
     console.log("Nome | CPF | Endereço");
+
+    const customers = db.getCustomers();
     for(let i=0; i < customers.length; i++){
         const customer = customers[i];
         console.log(`${customer.name} | ${customer.cpf} | ${customer.address}`);
-
     }
     
     await rl.question("Carregue no Enter para avançar...");
