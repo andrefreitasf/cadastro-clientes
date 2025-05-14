@@ -1,4 +1,10 @@
-const customers = [];
+const fs = require('fs');
+
+let customers = [];
+
+//JSON - JavaScript Object Notation 
+//serialização - salvar no disco
+//desserialização - ler do disco
 
 function addCustomer(name, address, cpf){
 
@@ -7,11 +13,16 @@ function addCustomer(name, address, cpf){
         : 1; // else
     customers.push({ name, address, id, cpf });
 
+    fs.writeFileSync("db.json", JSON.stringify(customers));
+
     return id;
 }
 
 function getCustomers(){
+    const customersString = fs.readFileSync("db.json", "utf-8");
+    customers = JSON.parse(customersString); //converte string para JSON 
     return customers;
+
 }
 
 
