@@ -44,6 +44,44 @@ async function startRegistration(){
     printMenu();
 }
 
+function validateId(id){
+    return id > 0;
+
+}
+
+function validateUpdateName(name){
+    if(!name) return true;
+    if(name.trim().indexOf(" ") === -1) return false;
+    return true;
+    
+}
+
+function validateUpdateAddress(address){
+    if(!address) return true;
+    if(address.length < 10) return false;
+    return true;
+}
+
+async function startUpdate(){
+    console.clear();
+
+    const id = await getAnswer("Qual o ID do cliente? ", "ID inválido, tente novamente.", validateId);
+    const name = await getAnswer("Qual o novo nome do cliente? Deixe em branco, se quise manter. ", "Nome inválido, tente novamente.", validateUpdateName);
+    const address = await getAnswer("Qual o novo endereço do cliente? Deixe em branco, se quise manter. ", "Endereço inválido, tente novamente.", validateUpdateAddress);
+    const cpf = await getAnswer("Qual o CPF do cliente? Deixe em branco, se quise manter. ", "CPF inválido, tente novamente.", () => { return true})
+
+    const result = db.updateCustomer(id, { name, address, cpf });
+    
+    if(result)
+        console.log("Cliente atualizado com sucesso!");
+    else
+        console.log("Cliente não encontrado!");
+
+    await rl.question("Carregue no Enter para avançar...");
+    printMenu();
+}
+
+
 async function listCustomers(){
     console.clear();
     console.log("Clientes cadastrados: ");
@@ -62,17 +100,19 @@ async function listCustomers(){
 async function printMenu(){
     console.clear();
     console.log("Menu:")
-    console.log("Opção 1 - Cadastrar Clientes");
-    console.log("Opção 2 - Ver Clientes");
-    console.log("Opção 3 - Encerrar");
+    console.log("Opção 1 - Ver Clientes");
+    console.log("Opção 2 - Cadastrar Cliente");
+    console.log("Opção 3 - Editar Cliente")
+    console.log("Opção 5 - Encerrar");
 
     const answer = await rl.question("Qual opção você deseja? ");
     
 
     switch(answer){
-        case "1": startRegistration(); break;
-        case "2": listCustomers(); break;
-        case "3": {
+        case "1": listCustomers(); break;
+        case "2": startRegistration(); break;
+        case "3": startUpdate(); break;
+        case "5": {
             console.clear(); 
             process.exit(0); }
         default: console.log("Opção inválida, tente novamente.");
