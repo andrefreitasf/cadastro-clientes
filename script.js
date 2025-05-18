@@ -85,24 +85,55 @@ async function startUpdate(){
 async function listCustomers(){
     console.clear();
     console.log("Clientes cadastrados: ");
-    console.log("Nome | CPF | Endereço");
+    console.log("ID | Nome | CPF | Endereço");
 
     const customers = db.getCustomers();
     for(let i=0; i < customers.length; i++){
         const customer = customers[i];
-        console.log(`${customer.name} | ${customer.cpf} | ${customer.address}`);
+        console.log(`${customer.id}| ${customer.name} | ${customer.cpf} | ${customer.address}`);
     }
     
     await rl.question("Carregue no Enter para avançar...");
     printMenu();
 }
 
+function validateConfirmation(choice){
+    choice = choice.toUpperCase();
+    return choice === "S" || choice === "N";
+}
+
+async function startDelete(){
+    console.clear();
+
+    const id = await getAnswer("Qual o ID do cliente que deseja apagar? ", "ID inválido, tente novamente.", validateId);
+    const customer = db.getCustomer(id);
+
+    const choice = await getAnswer(`Tem certeza que deseja excluir o cliente ${customer.name} ? (S/N) `, "Opção inválida", validateConfirmation);
+    
+    if(choice.toUpperCase() === "S"){
+        const result = db.deleteCustomer(id);
+        
+        if(result){
+            console.log("Cliente excluído com sucesso!");
+            await rl.question("Carregue no Enter para avançar...");
+            printMenu();
+        }else{
+            console.log("Cliente não encontrado.");
+            await rl.question("Carregue no Enter para avançar...");
+            printMenu();
+        }
+    }
+
+
+}
+
 async function printMenu(){
     console.clear();
-    console.log("Menu:")
+    console.log("Menu:");
     console.log("Opção 1 - Ver Clientes");
     console.log("Opção 2 - Cadastrar Cliente");
-    console.log("Opção 3 - Editar Cliente")
+    console.log("Opção 3 - Editar Cliente");
+    console.log("Opção 4 - Excluir Cliente");
     console.log("Opção 5 - Encerrar");
 
     const answer = await rl.question("Qual opção você deseja? ");
@@ -112,6 +143,7 @@ async function printMenu(){
         case "1": listCustomers(); break;
         case "2": startRegistration(); break;
         case "3": startUpdate(); break;
+        case "4": startDelete(); break;
         case "5": {
             console.clear(); 
             process.exit(0); }
@@ -119,7 +151,7 @@ async function printMenu(){
     }
 
     await rl.question("Carregue no Enter para avançar...");
-    printMenu()
+    printMenu();
 
 }
 

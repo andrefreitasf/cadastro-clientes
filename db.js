@@ -12,7 +12,7 @@ function addCustomer(name, address, cpf){
     fs.writeFileSync("db.json", JSON.stringify(customers));
 
     return id;
-}
+} 
 
 function validateId(id, customer){
     if(customer.id === id) 
@@ -54,6 +54,17 @@ function updateCustomer(id, newData){
     return true;
 }
 
+function deleteCustomer(id){
+    const customerIndex = customers.findIndex(customer => customer.id === Number(id));
+    if(customerIndex === -1) return false;
+
+    customers.splice(customerIndex, 1);
+
+    fs.writeFileSync("db.json", JSON.stringify(customers));
+
+    return true;
+}
+
 function getCustomers(){
     const customersString = fs.readFileSync("db.json", "utf-8");
     customers = JSON.parse(customersString); //converte string para JSON 
@@ -61,10 +72,18 @@ function getCustomers(){
 
 }
 
+function getCustomer(id){
+    //retorna o primero cliente que atenda a condição
+    return customers.find(customer => customer.id === Number(id));
+
+}
+
 
 module.exports = {
     addCustomer, 
     getCustomers,
-    updateCustomer
+    updateCustomer,
+    deleteCustomer,
+    getCustomer
 
 }
